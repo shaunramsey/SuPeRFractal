@@ -194,7 +194,9 @@ int computationThread(void *ptr) {
 			myengine->waitAllReady();
 #endif
 			std::cout << "[" << std::setw(5) << myengine->getImageCount() << "] Values stored in pixels: Max was: " << max << " and min was " << min << std::endl;
-			fprintf(myengine->getLogger(), "lambda range: %f, %f\n",max, min);
+			if(myengine->getLogger()) {
+			    fprintf(myengine->getLogger(), "lambda range: %f, %f\n",max, min);
+			  }
 			//myengine->setMinMax(min, max);
 #ifdef IMAGE_OUTPUT
 //		myengine->LogStatus(); //already done above
