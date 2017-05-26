@@ -921,8 +921,8 @@ void Engine::start(int s) {
 
 	div = NUM_THREADS / 2;
 	deltaW = SCREEN_WIDTH / (double)div;
-	iihi = (int)deltaW;
-	ihi = (int)deltaW;
+	iihi = (int)(deltaW+0.5);
+	ihi = (int)(deltaW+0.5);
 	
 
 	for (int i = 0; i < NUM_THREADS; i++) {
