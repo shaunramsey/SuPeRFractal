@@ -16,7 +16,7 @@ limitations under the License.
 #include "SDL.h"
 #include "Engine.h"
 #include <iostream>
-using namespace std;
+//using namespace std;//TODO: get rid of this nastynasty using namespace
 
 
 
@@ -64,20 +64,20 @@ int mainRender(int argc , char ** argv) {
 		if (frames % 12000 == 0) {
 			int milli30 = SDL_GetTicks() - frame30;
 			frame30 = SDL_GetTicks();
-			cout << "last 12000 frames are: " << 12000000.0 / milli30 << " fps." << endl;
+			std::cout << "last 12000 frames are: " << 12000000.0 / milli30 << " fps." << std::endl;
 		}
 		if (millis < 1000) {
 
 		}
 		else {
-			cout << millis << " milliseconds for just this frame " << endl;
+		  std::cout << millis << " milliseconds for just this frame " << std::endl;
 		}
 	//	SDL_Delay(1000);
 	}
 	
 
 
-	cout << "Exiting Program - Calling SDL_Quit()" << endl;
+	std::cout << "Exiting Program - Calling SDL_Quit()" << std::endl;
 
 
 
@@ -88,7 +88,7 @@ int mainRender(int argc , char ** argv) {
 }
 
 
-int main(int argc, char **argv) {
+int main(int argc, char *argv[]) {
 
 //	mainOutput(argc, argv);
 	mainRender(argc, argv); //render to screen

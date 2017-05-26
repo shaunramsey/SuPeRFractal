@@ -14,7 +14,7 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 #include "SDL.h"
-
+#include "conf.h"
 #include <string>
 
 #define NUM_THREADS 8

@@ -24,7 +24,7 @@ limitations under the License.
 #include <cmath>
 #include "computation.h"
 #include "Colors.h"
-using namespace std;
+
 
 struct computationThreadInfo {
 	Engine *engine;
@@ -86,7 +86,7 @@ int computationThread(void *ptr) {
 	int SCREEN_WIDTH, SCREEN_HEIGHT;
 	myengine->getScreenSize(SCREEN_WIDTH, SCREEN_HEIGHT);
 	printf("SCREEN WIDTH,HEIGHT=%d,%d\n", SCREEN_WIDTH, SCREEN_HEIGHT);
-	string ab = myengine->getAB();
+	std::string ab = myengine->getAB();
 	double Aend_value, Astart_value, Bend_value, Bstart_value;
 #ifdef INTERPOLATE_NUMBER
 	myengine->setContinuousRegionAandAdjustRegion(1.5);
@@ -124,11 +124,11 @@ int computationThread(void *ptr) {
 #ifdef MULTIPLE_THREADS
 		if (info->index == 0) {
 #endif
-			cout << "[" << setw(4) << myengine->getImageCount() << "] Range: [" <<
+		  std::cout << "[" << std::setw(4) << myengine->getImageCount() << "] Range: [" <<
 				Bstart_value << ", " << Bend_value << "]-[" <<
 				Astart_value << ", " << Aend_value << "]"
 				<< " a=[" << continuousA << "] iters=["
-				<< myengine->getIterations() << "]*ab=" << ab << endl;
+				<< myengine->getIterations() << "]*ab=" << ab << std::endl;
 #ifdef IMAGE_OUTPUT
 			myengine->LogStatus();
 #endif
@@ -146,7 +146,7 @@ int computationThread(void *ptr) {
 		
 #ifdef VERBOSE
 		SDL_Delay(info->index * 1000);
-		cout << "[" << info->index << "] i: " << ilo << "-" << ihi << " j: " << jlo << " - " << jhi << endl;
+		std::cout << "[" << info->index << "] i: " << ilo << "-" << ihi << " j: " << jlo << " - " << jhi << std::endl;
 #endif
 		for (int k = jlo; k < jhi; k++) {
 			int j =  info->index % 2 ? k : (int)(jhi - k + jlo - 1);
@@ -170,17 +170,17 @@ int computationThread(void *ptr) {
 				double a = j * Arange / SCREEN_WIDTH + Astart_value;//start with 2 end at 4
 				double b = i * Brange / SCREEN_HEIGHT  + Bstart_value; //start with 2 end at 4
 				double l = lambda(a, b, ab, myengine->getIterations(), continuousA, lock); 
-				if (l > max) { max = l; } //cout << "[" << a << ", " << b << "] - Max is now: " << l << endl;
+				if (l > max) { max = l; } //std::cout << "[" << a << ", " << b << "] - Max is now: " << l << std::endl;
 				if (l < min && l != -INFINITY) { min = l; }
 
 #ifdef VERBOSE
-				if (!(iters % 10000)) cout << "[" << iters << " / " << SCREEN_WIDTH*SCREEN_HEIGHT <<
-					"] -- Current N=[" << myengine->getIterations() << "] with ab=" << ab << endl;
+				if (!(iters % 10000)) std::cout << "[" << iters << " / " << SCREEN_WIDTH*SCREEN_HEIGHT <<
+					"] -- Current N=[" << myengine->getIterations() << "] with ab=" << ab << std::endl;
 #endif
 				myengine->setPixel(i, j, l, a, b);
 				//	SDL_SetRenderDrawColor(myengine->ren, l, l, 0, 255);
 				//	SDL_RenderDrawPoint(myengine->ren, (a - 2) / 2.0*SCREEN_WIDTH, (4 - b) / 2.0*SCREEN_HEIGHT);
-				//	cout << "[" << (a - 2)/2.0*SCREEN_WIDTH << ", " << (b - 2)/2.0*SCREEN_WIDTH << "] == " << "[" << a << ", " << b << "] = " << l << " max=" << max << endl;
+				//	std::cout << "[" << (a - 2)/2.0*SCREEN_WIDTH << ", " << (b - 2)/2.0*SCREEN_WIDTH << "] == " << "[" << a << ", " << b << "] = " << l << " max=" << max << std::endl;
 
 
 
@@ -193,7 +193,7 @@ int computationThread(void *ptr) {
 		if (info->index == 0) {
 			myengine->waitAllReady();
 #endif
-			cout << "[" << setw(5) << myengine->getImageCount() << "] Values stored in pixels: Max was: " << max << " and min was " << min << endl;
+			std::cout << "[" << std::setw(5) << myengine->getImageCount() << "] Values stored in pixels: Max was: " << max << " and min was " << min << std::endl;
 			fprintf(myengine->getLogger(), "lambda range: %f, %f\n",max, min);
 			//myengine->setMinMax(min, max);
 #ifdef IMAGE_OUTPUT
@@ -211,7 +211,7 @@ int computationThread(void *ptr) {
 #endif
 			myengine->increaseImageCount();
 #ifdef MULTIPLE_THREADS
-		//	cout << "Signalling next round of computation now." << endl;
+		//	std::cout << "Signalling next round of computation now." << std::endl;
 			myengine->signalReady();
 		}
 #endif
@@ -228,7 +228,7 @@ Engine::Engine(int w, int h)
 	logger = NULL;
 #ifdef IMAGE_OUTPUT
 	fopen_s(&logger, "../../Images/log.txt", "a+");
-	if (!logger) cerr << "Problem opening logger . . . images/log not retained!" << endl;
+	if (!logger) std::cerr << "Problem opening logger . . . images/log not retained!" << std::endl;
 	else 	     fprintf(logger, "---New Program Execution---\n");
 	//fclose(logger);
 #endif
@@ -298,7 +298,7 @@ void Engine::LogStatus() {
 	//fopen_s(&logger, "../../Images/log.txt", "a"); //arleady opened?
 	if (!logger) {
 		perror("LogStatus Error:");
-		//cerr << "LogStatus Error: Problem opening logger . . . images/log not retained!" << endl;
+		//std::cerr << "LogStatus Error: Problem opening logger . . . images/log not retained!" << std::endl;
 	}
 	else {
 		fprintf(logger, "[%4d] Range [%f, %f]-[%f, %f] a=[%f] iters=[%d]*ab=%s\n", imageCount,
@@ -310,13 +310,6 @@ void Engine::LogStatus() {
 
 void Engine::outputWindow() {
 	SDL_Surface*screen = SDL_GetWindowSurface(win);
-	//SDL_LockSurface(screen);
-	//	IMG_SavePNG(screen, "justsaveme.png");
-	//SDL_SaveBMP(screen, "justsaveme.bmp");
-	//SDL_Surface*shot = SDL_PNGFormatAlpha(screen);
-	//IMG_SavePNG(shot, "justsaveme3.png");
-	//SDL_SavePNG(screen, "justsaveme2.png");
-	//SDL_UnlockSurface(screen);
 
 #ifdef BMP
 	unsigned char * pixels = new unsigned char[SCREEN_WIDTH*SCREEN_HEIGHT * 3];
@@ -343,28 +336,28 @@ void Engine::outputWindow() {
 	}
 
 	
-	stringstream oss; oss << imageCount;
+	std::stringstream oss; oss << imageCount;
 	
-	string PNGfilename = "../../Images/" + ab + oss.str() + ".png";
+	std::string PNGfilename = "../../Images/" + ab + oss.str() + ".png";
 	/*
-	string filenameascii = ab + oss.str() + "ascii.ppm";
+	std::string filenameascii = ab + oss.str() + "ascii.ppm";
 	outToP3(filenameascii.c_str(), pixels2, SCREEN_WIDTH, SCREEN_HEIGHT);
-	string filenamebinar = ab + oss.str() + "binar.ppm";
+	std::string filenamebinar = ab + oss.str() + "binar.ppm";
 	outToP6(filenamebinar.c_str(), pixels2, SCREEN_WIDTH, SCREEN_HEIGHT);
 	*/
 	
 #ifdef BMP
-	string BMPfilename = ab + oss.str() + ".bmp";
+	std::string BMPfilename = ab + oss.str() + ".bmp";
 	outToBMP(BMPfilename.c_str(), pixels, SCREEN_WIDTH, SCREEN_HEIGHT);
 #endif
 	printf("Starting a write to PNGfilename=%s\n", PNGfilename.c_str());
 	outToPNG(PNGfilename.c_str(), pixels2, SCREEN_WIDTH, SCREEN_HEIGHT);
-	cout << "Outputting pixels to image(s): " << ab << imageCount << ".png" << endl;
+	std::cout << "Outputting pixels to image(s): " << ab << imageCount << ".png" << std::endl;
 
 //	logger = NULL;
 //	fopen_s(&logger, "../../Images/log.txt", "a");
 	if (!logger) {
-//		cerr << "outputWindow Error: Problem opening logger . . . Writing output status" << endl;
+//		std::cerr << "outputWindow Error: Problem opening logger . . . Writing output status" << std::endl;
 		perror("outputFile:");
 	}
 	else {
@@ -398,31 +391,31 @@ void Engine::setLock(int l) {
 	lock = l;
 }
 
-void logSDLError(ostream &out, string msg) {
-	out << msg.c_str() << " Error: " << SDL_GetError() << endl;
+void logSDLError(std::ostream &out, std::string msg) {
+	out << msg.c_str() << " Error: " << SDL_GetError() << std::endl;
 }
 
-void logSuccess(ostream &out, string msg) {
-	cout << msg.c_str() << " - Successful" << endl;
+void logSuccess(std::ostream &out, std::string msg) {
+	std::cout << msg.c_str() << " - Successful" << std::endl;
 }
 
 int Engine::init() {
 
 	if (SDL_Init(SDL_INIT_VIDEO) != 0) {
-		cout << "SDL_INIT Error: " << SDL_GetError() << endl;
+		std::cout << "SDL_INIT Error: " << SDL_GetError() << std::endl;
 		return 1;
 	}
 
 	win = SDL_CreateWindow("SuPeR Fractal Demo", 100, 100, SCREEN_WIDTH, SCREEN_HEIGHT, SDL_WINDOW_SHOWN);
 	if (win == nullptr) {
-		logSDLError(cout,"SDL_CreateWindow");
+		logSDLError(std::cout,"SDL_CreateWindow");
 		SDL_Quit();
 		return 1;
 	}
 
 	colorWin = SDL_CreateWindow("Colors", 100, SCREEN_HEIGHT+150, SCREEN_WIDTH, COLOR_SCREEN_HEIGHT, SDL_WINDOW_SHOWN);
 	if (colorWin == nullptr) {
-		logSDLError(cout, "SDL_CreateWindow");
+		logSDLError(std::cout, "SDL_CreateWindow");
 		SDL_Quit();
 		return 1;
 	}
@@ -430,7 +423,7 @@ int Engine::init() {
 	mainRenderer = SDL_CreateRenderer(win, -1, SDL_RENDERER_ACCELERATED | SDL_RENDERER_PRESENTVSYNC);
 	if (mainRenderer == nullptr) {
 		SDL_DestroyWindow(win);
-		cout << "SDL_CreateRenderer Error: " << SDL_GetError() << endl;
+		std::cout << "SDL_CreateRenderer Error: " << SDL_GetError() << std::endl;
 		SDL_Quit();
 		return 1;
 	}
@@ -438,7 +431,7 @@ int Engine::init() {
 	colors = SDL_CreateRenderer(colorWin, -1, SDL_RENDERER_ACCELERATED | SDL_RENDERER_PRESENTVSYNC);
 	if (colors == nullptr) {
 		SDL_DestroyWindow(colorWin);
-		cout << "SDL_CreateRenderer Error: " << SDL_GetError() << endl;
+		std::cout << "SDL_CreateRenderer Error: " << SDL_GetError() << std::endl;
 		SDL_Quit();
 		return 1;
 	}
@@ -455,7 +448,7 @@ int Engine::init() {
 
 
 	if ((IMG_Init(IMG_INIT_PNG) & IMG_INIT_PNG) != IMG_INIT_PNG) {
-		logSDLError(std::cout, "IMG_Init");
+		logSDLError(std::std::cout, "IMG_Init");
 		SDL_Quit();
 		return 1;
 	}
@@ -480,21 +473,21 @@ void Engine::keypress(SDL_Event &e) {
 		showSelectionRectangle = (showSelectionRectangle + 1 ) % 2;
 		break;
 	case SDLK_g:
-		cout << "Enter an a for continuous Region: ";
-		cin >> continuousRegionA;
+		std::cout << "Enter an a for continuous Region: ";
+		std::cin >> continuousRegionA;
 		setContinuousRegionAandAdjustRegion(continuousRegionA);
 		break;
 	case SDLK_d:
-		cout << "Enter a bunch of parameters:";
-		cout << "continuous a value: ";
-		cin >> continuousRegionA;
-		cout << "A-B range. start then end: ";
-		cin >> Astart_value >> Aend_value;
-		cin >> Bstart_value >> Bend_value;
+		std::cout << "Enter a bunch of parameters:";
+		std::cout << "continuous a value: ";
+		std::cin >> continuousRegionA;
+		std::cout << "A-B range. start then end: ";
+		std::cin >> Astart_value >> Aend_value;
+		std::cin >> Bstart_value >> Bend_value;
 		break;
 	case SDLK_r:
 		if (showSelectionRectangle) {
-			cout << "Adjusting region to the given selection Rectangle. New values are:" << endl;
+			std::cout << "Adjusting region to the given selection Rectangle. New values are:" << std::endl;
 			a2 = ((SCREEN_HEIGHT - selectionRectangleY) / (double)SCREEN_HEIGHT) * (Aend_value - Astart_value) + Astart_value;
 			a1 = ((SCREEN_HEIGHT - selectionRectangleY - selectionRectangleSize) / (double)SCREEN_HEIGHT) * (Aend_value - Astart_value) + Astart_value;
 			b1 = (selectionRectangleX / (double)SCREEN_WIDTH) * (Bend_value - Bstart_value) + Bstart_value;
@@ -503,8 +496,8 @@ void Engine::keypress(SDL_Event &e) {
 			Aend_value = a2;
 			Bstart_value = b1;
 			Bend_value = b2;
-			cout << "b= " << Bstart_value << ", " << Bend_value
-				 << " -- a= " << Astart_value << ", " << Aend_value << endl;
+			std::cout << "b= " << Bstart_value << ", " << Bend_value
+				 << " -- a= " << Astart_value << ", " << Aend_value << std::endl;
 			showSelectionRectangle = 0;
 		}
 		break;
@@ -515,43 +508,43 @@ void Engine::keypress(SDL_Event &e) {
 		Bstart_value = Bstart_value - b1 / 4; Bend_value = Bend_value + b1 / 4;
 		if (Bstart_value < 0) { Bend_value = Bend_value - Bstart_value; Bstart_value = 0; }
 
-		cout << Astart_value << ", " << Aend_value << " -- " << Bstart_value << ", " << Bend_value << endl;
+		std::cout << Astart_value << ", " << Aend_value << " -- " << Bstart_value << ", " << Bend_value << std::endl;
 		break;
 	case SDLK_PLUS: case SDLK_KP_PLUS: case SDLK_EQUALS:
 		a1 = Aend_value - Astart_value; b1 = Bend_value - Bstart_value;
 		Astart_value = Astart_value + a1/4; Aend_value = Aend_value - a1/4;
 		Bstart_value = Bstart_value + b1/4; Bend_value = Bend_value - b1/4;
-		cout << Astart_value << ", " << Aend_value << " -- " << Bstart_value << ", " << Bend_value << endl;
+		std::cout << Astart_value << ", " << Aend_value << " -- " << Bstart_value << ", " << Bend_value << std::endl;
 		break;
 	case SDLK_UP:
 		Astart_value = Astart_value + adj_amt; Aend_value = Aend_value + adj_amt;
-		cout << Astart_value << ", " << Aend_value << " -- " << Bstart_value << ", " << Bend_value << endl;
+		std::cout << Astart_value << ", " << Aend_value << " -- " << Bstart_value << ", " << Bend_value << std::endl;
 		break;
 	case SDLK_DOWN:
 		Astart_value = Astart_value - adj_amt; Aend_value = Aend_value - adj_amt;
 		if (Astart_value < 0) { Aend_value = Aend_value - Astart_value; Astart_value = 0; }
-		cout << Astart_value << ", " << Aend_value << " -- " << Bstart_value << ", " << Bend_value << endl;
+		std::cout << Astart_value << ", " << Aend_value << " -- " << Bstart_value << ", " << Bend_value << std::endl;
 		break;
 	case SDLK_LEFT:
 		Bstart_value = Bstart_value - adj_amt; Bend_value = Bend_value - adj_amt;
 		if (Bstart_value < 0) { Bend_value = Bend_value - Bstart_value; Bstart_value = 0; }
-		cout << Astart_value << ", " << Aend_value << " -- " << Bstart_value << ", " << Bend_value << endl;
+		std::cout << Astart_value << ", " << Aend_value << " -- " << Bstart_value << ", " << Bend_value << std::endl;
 		break;
 	case SDLK_RIGHT:
 		Bstart_value = Bstart_value + adj_amt; Bend_value = Bend_value + adj_amt;
-		cout << Astart_value << ", " << Aend_value << " -- " << Bstart_value << ", " << Bend_value << endl;
+		std::cout << Astart_value << ", " << Aend_value << " -- " << Bstart_value << ", " << Bend_value << std::endl;
 		break;
 	case SDLK_a:
 		Astart_value = Bstart_value = 1.0;
 		break;
 	case SDLK_p: 
 		setContinuousRegionAandAdjustRegion(getContinuousRegionA() + .1);
-		cout << "ContinuousRegionA is now: " << continuousRegionA << endl;
-		cout << Astart_value << ", " << Aend_value << " -- " << Bstart_value << ", " << Bend_value << endl;
+		std::cout << "ContinuousRegionA is now: " << continuousRegionA << std::endl;
+		std::cout << Astart_value << ", " << Aend_value << " -- " << Bstart_value << ", " << Bend_value << std::endl;
 		break;
 	case SDLK_l: //change which function will be displayed - newX,newFrac,oldFrac
 		lock = (lock + 1) % 4;
-		cout << "New function rendered is = " << lock << endl;
+		std::cout << "New function rendered is = " << lock << std::endl;
 		break;
 	case SDLK_o:
 		outputWindow();
@@ -570,7 +563,7 @@ void Engine::colormousewheel(SDL_Event &e) {
 	int x, y;
 	if (colorMode >= 2) return; //it means we're in rainbow territory
 	SDL_GetMouseState(&x, &y);
-//	cout << "movement in y is: " << e.wheel.y << endl;
+//	std::cout << "movement in y is: " << e.wheel.y << std::endl;
 	int id = (int)(NUM_COLORS * x / (double)SCREEN_WIDTH);
 	for (int i = 0; i < 3; i++) {
 		colorsList[id][i] = colorsList[id][i] + e.wheel.y*15;
@@ -585,17 +578,17 @@ void Engine::colormousepress(SDL_Event &e) {
 	switch (e.button.button) {
 	case SDL_BUTTON_RIGHT:
 		colorMode = (colorMode + 1) % 4;
-		cout << "colorMode=" << colorMode << endl;
+		std::cout << "colorMode=" << colorMode << std::endl;
 		drawColorBar(); //redraw the lower window
 		break;
 	case SDL_BUTTON_LEFT:
 		if (colorMode >= 2) return; //should actually select a color here
 		id = (int)(NUM_COLORS * e.button.x / (double) SCREEN_WIDTH);
 		if (id < 0 || id > NUM_COLORS) break;
-		cout << "New color id=[" << id << "] current=[" 
+		std::cout << "New color id=[" << id << "] current=[" 
 			 << colorsList[id][0] <<", " << colorsList[id][1] << ", " << colorsList[id][2]
 			 <<" as ub 0-255 r,g,b: ";
-		cin >> colorsList[id][0] >> colorsList[id][1] >> colorsList[id][2];
+		std::cin >> colorsList[id][0] >> colorsList[id][1] >> colorsList[id][2];
 		drawColorBar();
 		break;
 	default:
@@ -619,21 +612,21 @@ void Engine::mousepress(SDL_Event &e) {
 	case SDL_BUTTON_LEFT:
 		int r, g, b;
 		getColor(e.button.x, SCREEN_HEIGHT -1 - e.button.y, r, g, b);
-		outPixelInfo(cout, e.button.x, SCREEN_HEIGHT - 1 - e.button.y);
-//		cout << "Chosen click location [" << e.button.x << ", " << e.button.y << "] " << endl;
-//		cout << "Lambda at this position is: " <<  getPixel(e.button.x, SCREEN_HEIGHT - 1 - e.button.y) << endl;
-		cout << "Color is [" << r << ", " << g << ", " << b << "]" << endl;
+		outPixelInfo(std::cout, e.button.x, SCREEN_HEIGHT - 1 - e.button.y);
+//		std::cout << "Chosen click location [" << e.button.x << ", " << e.button.y << "] " << std::endl;
+//		std::cout << "Lambda at this position is: " <<  getPixel(e.button.x, SCREEN_HEIGHT - 1 - e.button.y) << std::endl;
+		std::cout << "Color is [" << r << ", " << g << ", " << b << "]" << std::endl;
 		break;
 	case SDL_BUTTON_RIGHT:
 		showSelectionRectangle = ( showSelectionRectangle + 1 ) % 2;
 		selectionRectangleX = e.button.x - selectionRectangleSize/2;  
 		selectionRectangleY = e.button.y - selectionRectangleSize/2;
-		cout << "rectangle at: " << selectionRectangleX << " " << selectionRectangleY << " of size " << selectionRectangleSize << endl;
+		std::cout << "rectangle at: " << selectionRectangleX << " " << selectionRectangleY << " of size " << selectionRectangleSize << std::endl;
 		double a2 = ((SCREEN_HEIGHT - selectionRectangleY) / (double)SCREEN_HEIGHT) * (Bend_value - Bstart_value) + Bstart_value;
 		double a1 = (((SCREEN_HEIGHT - selectionRectangleY) - selectionRectangleSize ) / (double)SCREEN_HEIGHT) * (Bend_value - Bstart_value) + Bstart_value;
 		double b1 = (selectionRectangleX / (double)SCREEN_WIDTH) * (Aend_value - Astart_value) + Astart_value;
 		double b2 = ((selectionRectangleX + selectionRectangleSize ) / (double)SCREEN_WIDTH) * (Aend_value - Astart_value) + Astart_value;
-		cout << "New range would be  b=[" << b1 << ", " << b2 << "] " << "a=[" << a1 << ", " << a2 << "] " << endl;
+		std::cout << "New range would be  b=[" << b1 << ", " << b2 << "] " << "a=[" << a1 << ", " << a2 << "] " << std::endl;
 		if (showSelectionRectangle == 1) {
 			reta1 = Astart_value;
 			reta2 = Aend_value;
@@ -704,7 +697,7 @@ void Engine::getScreenSize(int &W, int&H) {
 	W = SCREEN_WIDTH;
 	H = SCREEN_HEIGHT;
 }
-string Engine::getAB() {
+std::string Engine::getAB() {
 	return ab;
 }
 FILE* Engine::getLogger() { return logger; }
@@ -720,7 +713,7 @@ double Engine::getPixel(int x, int y) {
 void Engine::outPixelInfo(std::ostream &out, int x, int y) {
 	out << "[" << pixelInfo[x + y*SCREEN_WIDTH].x << ", " << pixelInfo[x + y*SCREEN_WIDTH].y << "] -- "
 		<< "[" << pixelInfo[x + y*SCREEN_WIDTH].a << ", " << pixelInfo[x + y*SCREEN_WIDTH].b << "] ==> "
-		<< pixelInfo[x + y*SCREEN_WIDTH].value << endl;
+		<< pixelInfo[x + y*SCREEN_WIDTH].value << std::endl;
 }
 
 void Engine::setPixel(int x, int y, double val, double a, double b) {
@@ -913,7 +906,7 @@ void Engine::start(int s) {
 	quit = 0;
 
 //	SDL_Thread *thread = SDL_CreateThread(renderThread, "RenderThread", (void*)this);
-//	if (thread == nullptr) { 		logSDLError(cout, "SDL_CreateThread"); 	}
+//	if (thread == nullptr) { 		logSDLError(std::cout, "SDL_CreateThread"); 	}
 //	else { 		int threadReturnValue; 		SDL_WaitThread(thread, &threadReturnValue);	}
 
 	int div = 1;
@@ -926,8 +919,8 @@ void Engine::start(int s) {
 
 	div = NUM_THREADS / 2;
 	deltaW = SCREEN_WIDTH / (double)div;
-	iihi = deltaW;
-	ihi = deltaW;
+	iihi = (int)deltaW;
+	ihi = (int)deltaW;
 	
 
 	for (int i = 0; i < NUM_THREADS; i++) {
@@ -963,7 +956,7 @@ void Engine::start(int s) {
 
 		SDL_Thread *thread = SDL_CreateThread(computationThread, "ComputationThread", (void*)mythreadinfo);
 		if (thread == nullptr) {
-			logSDLError(cout, "SDL_CreateThread - computationThread");
+			logSDLError(std::cout, "SDL_CreateThread - computationThread");
 		}
 		else {
 			//		int threadReturn;
@@ -978,10 +971,10 @@ void Engine::start(int s) {
 SDL_Texture* Engine::loadTexture(char *filename, SDL_Renderer *ren) {
 	SDL_Texture *texture = IMG_LoadTexture(ren, filename);
 	if (texture == nullptr) {
-		logSDLError(cout, "CreateTextureFromSurface");
+		logSDLError(std::cout, "CreateTextureFromSurface");
 	}
 	else {
-		logSuccess(cout, "LoadTexture: \"" + (string)filename + "\"");
+		logSuccess(std::cout, "LoadTexture: \"" + (std::string)filename + "\"");
 	}
 	return texture;
 }
