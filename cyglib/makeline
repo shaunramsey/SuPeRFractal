@@ -1,0 +1,2 @@
+#!/bin/bash
+g++ -o out -std=c++11 -I/usr/local/include/SDL2 -L/usr/local/lib -L/usr/local/bin main.cpp conf.cpp Engine.cpp -lcygwin -lSDL2main -lSDL2 -lSDL2_image -lpng -mwindows
