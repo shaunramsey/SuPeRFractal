@@ -1,6 +1,9 @@
 #include "conf.h"
+#include <errno.h>
+#include <cassert>
+#include <cstdio>
 
-#ifdef __unix
+#if !defined(_WIN32) && !defined(_WIN64)
 
 int fopen_s(FILE **f, const char *name, const char *mode) {
     int ret = 0;
@@ -10,5 +13,6 @@ int fopen_s(FILE **f, const char *name, const char *mode) {
         ret = errno;
     return ret;
     }
+
 #endif
 

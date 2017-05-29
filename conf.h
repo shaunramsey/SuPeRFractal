@@ -3,14 +3,12 @@
 #ifndef _super_fractal_8641_h
 #define _super_fractal_8641_h
 
-#ifdef __unix
+
+#if !defined(_WIN32) && !defined(_WIN64)
+
+
 #define nullptr 0
-#endif
 
-
-#ifdef __unix
-#include <errno.h>
-#include <cassert>
 #include <cstdio>
 
 int fopen_s(FILE **f, const char *name, const char *mode);/* {
@@ -23,6 +21,5 @@ int fopen_s(FILE **f, const char *name, const char *mode);/* {
     }*/
 
 
-#endif
-
-#endif
+#endif //not win32/64
+#endif //for the header
