@@ -14,8 +14,8 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-#ifndef _super_fractal_8641_h
-#define _super_fractal_8641_h
+#ifndef _super_fractal_8641_conf_h_
+#define _super_fractal_8641_conf_h_
 
 
 #if !defined(_WIN32) && !defined(_WIN64)
